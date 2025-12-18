@@ -1,0 +1,10 @@
+.git
+.gitignore
+**/*.log
+**/*_test.go
+bin/
+build/
+.tmp/
+.DS_Store
+.idea/
+.vscode/
