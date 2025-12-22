@@ -1,19 +1,14 @@
 package httpclient
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 )
 
-type MockDoer struct {
-	DoFunc func(*http.Request) (*http.Response, error)
-}
-
-func (m *MockDoer) Do(req *http.Request) (*http.Response, error) {
-	return m.DoFunc(req)
-}
+const testHTTPTimeout = 100 * time.Millisecond
 
 func TestFetchWordPair_Success(t *testing.T) {
 	t.Parallel()
@@ -28,13 +23,13 @@ func TestFetchWordPair_Success(t *testing.T) {
 		}
 	}))
 	defer server.Close()
-	client := NewAPIClientWithHTTP(
-		&http.Client{Timeout: testHTTPTimeout},
-		server.URL,
+	client := NewAPIClient(
+		WithHTTPClient(&http.Client{Timeout: testHTTPTimeout}),
+		WithEndpoint(server.URL),
 	)
 
 	// Act
-	wordPair, err := client.FetchWordPair()
+	wordPair, err := client.FetchWordPair(context.Background())
 
 	// Assert
 	if err != nil {
@@ -58,10 +53,10 @@ func TestFetchWordPair_ServerError(t *testing.T) {
 	}))
 	defer server.Close()
 	httpClient := &http.Client{Timeout: testHTTPTimeout}
-	client := NewAPIClientWithHTTP(httpClient, server.URL)
+	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint(server.URL))
 
 	// Act
-	wordPair, err := client.FetchWordPair()
+	wordPair, err := client.FetchWordPair(context.Background())
 
 	// Assert
 	if err == nil {
@@ -85,10 +80,10 @@ func TestFetchWordPair_InvalidJSON(t *testing.T) {
 	}))
 	defer server.Close()
 	httpClient := &http.Client{Timeout: testHTTPTimeout}
-	client := NewAPIClientWithHTTP(httpClient, server.URL)
+	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint(server.URL))
 
 	// Act
-	wordPair, err := client.FetchWordPair()
+	wordPair, err := client.FetchWordPair(context.Background())
 
 	// Assert
 	if err == nil {
@@ -104,10 +99,10 @@ func TestFetchWordPair_HTTPError(t *testing.T) {
 
 	// Assign
 	httpClient := &http.Client{Timeout: testHTTPTimeout}
-	client := NewAPIClientWithHTTP(httpClient, "http://127.0.0.1:0")
+	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint("http://127.0.0.1:0"))
 
 	// Act
-	wordPair, err := client.FetchWordPair()
+	wordPair, err := client.FetchWordPair(context.Background())
 
 	// Assert
 	if err == nil {
@@ -132,10 +127,10 @@ func TestFetchWordPair_Timeout(t *testing.T) {
 	}))
 	defer server.Close()
 	httpClient := &http.Client{Timeout: 50 * time.Millisecond}
-	client := NewAPIClientWithHTTP(httpClient, server.URL)
+	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint(server.URL))
 
 	// Act
-	wordPair, err := client.FetchWordPair()
+	wordPair, err := client.FetchWordPair(context.Background())
 
 	// Assert
 	if err == nil {

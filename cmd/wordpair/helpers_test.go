@@ -1,6 +1,7 @@
 package main
 
 import (
+	"apl-interview/anagram"
 	"strings"
 	"testing"
 )
@@ -162,7 +163,7 @@ func TestAreAnagrams(t *testing.T) {
 	for _, testCase := range tests {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
-			result := areAnagrams(testCase.args[0], testCase.args[1])
+			result := areAnagrams(testCase.args[0], testCase.args[1], anagram.FreqMapChecker{})
 			if result == testCase.wantErr {
 				t.Fatalf("areAnagrams(%v) = %v, want %v", testCase.args, result, testCase.wantErr)
 			}
