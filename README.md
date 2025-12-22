@@ -85,6 +85,13 @@ Run unit and integration tests:
 go test ./...
 ```
 
+Run with coverage:
+
+```bash
+go test ./... -cover
+```
+
+
 ---
 
 ### Configuration
