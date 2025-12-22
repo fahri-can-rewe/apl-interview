@@ -44,7 +44,7 @@ func buildAPIClient(apiBaseURL string) (*httpclient.APIClient, error) {
 func fetchWordPair(apiClient *httpclient.APIClient) (*httpclient.WordPair, error) {
 	wordPair, err := apiClient.FetchWordPair()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get word pair: %v", err)
+		return nil, fmt.Errorf("failed to get word pair: %w", err)
 	}
 	return wordPair, nil
 }
