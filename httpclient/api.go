@@ -1,10 +1,12 @@
 package httpclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"io"
 	"net/http"
+	"time"
 )
 
 type WordPair struct {
@@ -12,38 +14,61 @@ type WordPair struct {
 	SecondWord string `json:"word2"`
 }
 
+type Doer interface { // small interface for testability
+	Do(*http.Request) (*http.Response, error)
+}
+
 type APIClient struct {
-	HTTPClient *http.Client
-	Endpoint   string
+	doer     Doer
+	endpoint string
 }
 
-func NewAPIClientWithHTTP(client *http.Client, endpoint string) *APIClient {
-	return &APIClient{
-		HTTPClient: client,
-		Endpoint:   endpoint,
-	}
-}
+type Option func(*APIClient)
 
-func (client *APIClient) FetchWordPair() (*WordPair, error) {
-	response, err := client.HTTPClient.Get(client.Endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("error making GET call to %s: %w", client.Endpoint, err)
-	}
-	defer func() {
-		if cerr := response.Body.Close(); cerr != nil {
-			log.Printf("warning: failed to close response body: %v", cerr)
+func WithEndpoint(ep string) Option         { return func(c *APIClient) { c.endpoint = ep } }
+func WithHTTPClient(hc *http.Client) Option { return func(c *APIClient) { c.doer = hc } }
+func WithTimeout(d time.Duration) Option {
+	return func(ac *APIClient) {
+		if hc, isOk := ac.doer.(*http.Client); isOk {
+			hc.Timeout = d
 		}
-	}()
-
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected HTTP status code: %d", response.StatusCode)
 	}
+}
 
-	var wordPair WordPair
-	err = json.NewDecoder(response.Body).Decode(&wordPair)
+func NewAPIClient(opts ...Option) *APIClient {
+	c := &APIClient{
+		doer: &http.Client{Timeout: 5 * time.Second},
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
+}
+
+func (ac *APIClient) FetchWordPair(ctx context.Context) (*WordPair, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, ac.endpoint, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error decoding JSON response: %w", err)
+		return nil, fmt.Errorf("build request: %w", err)
 	}
 
-	return &wordPair, nil
+	resp, err := ac.doer.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("GET %s: %w", ac.endpoint, err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("failed to close response body: %v\n", err)
+		}
+	}(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %d", resp.StatusCode)
+	}
+
+	var wp WordPair
+	if err := json.NewDecoder(resp.Body).Decode(&wp); err != nil {
+		return nil, fmt.Errorf("decode response: %w", err)
+	}
+	return &wp, nil
 }
