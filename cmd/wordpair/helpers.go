@@ -3,19 +3,16 @@ package main
 import (
 	"apl-interview/anagram"
 	"apl-interview/httpclient"
+	"context"
 	"errors"
 	"flag"
 	"fmt"
-	"net/http"
 	"net/url"
-	"path"
-	"time"
 )
 
 const (
 	defaultAPIBaseURL = "https://interview.sowula.at"
 	apiPath           = "/word-pair"
-	reqTimeout        = 5 * time.Second
 )
 
 type config struct {
@@ -36,17 +33,17 @@ func buildAPIClient(apiBaseURL string) (*httpclient.APIClient, error) {
 	if err != nil || address.Scheme == "" || address.Host == "" {
 		return nil, fmt.Errorf("bad --apiBaseUrl: %q", apiBaseURL)
 	}
-	endpoint := address.ResolveReference(&url.URL{Path: path.Join(address.Path, apiPath)}).String()
-	httpClient := &http.Client{Timeout: reqTimeout}
-	return httpclient.NewAPIClientWithHTTP(httpClient, endpoint), nil
+	endpoint, _ := url.JoinPath(address.String(), apiPath)
+	client := httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint))
+	return client, nil
 }
 
-func fetchWordPair(apiClient *httpclient.APIClient) (*httpclient.WordPair, error) {
-	wordPair, err := apiClient.FetchWordPair()
+func fetchWordPair(ctx context.Context, ac *httpclient.APIClient) (*httpclient.WordPair, error) {
+	wp, err := ac.FetchWordPair(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get word pair: %w", err)
 	}
-	return wordPair, nil
+	return wp, nil
 }
 
 func validateWordPair(word1, word2 string) error {
@@ -59,6 +56,6 @@ func validateWordPair(word1, word2 string) error {
 	return nil
 }
 
-func areAnagrams(word1, word2 string) bool {
-	return anagram.AreAnagrams(anagram.CountLetters(word1), anagram.CountLetters(word2))
+func areAnagrams(word1, word2 string, strategy anagram.Checker) bool {
+	return strategy.AreAnagrams(word1, word2)
 }

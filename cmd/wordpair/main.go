@@ -1,29 +1,36 @@
 package main
 
 import (
+	"apl-interview/anagram"
+	"context"
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
+const fiveSecondsTimeout = 5 * time.Second
+
 func main() {
-	if err := run(os.Args[1:]); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
+	defer cancel()
+	if err := run(ctx, os.Args[1:]); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(args []string) error {
+func run(ctx context.Context, args []string) error {
 	conf, err := parseArgs(args)
 	if err != nil {
 		return err
 	}
 
-	apiClient, err := buildAPIClient(conf.APIBaseURL)
+	ac, err := buildAPIClient(conf.APIBaseURL)
 	if err != nil {
 		return err
 	}
 
-	wp, err := fetchWordPair(apiClient)
+	wp, err := fetchWordPair(ctx, ac)
 	if err != nil {
 		return err
 	}
@@ -31,7 +38,7 @@ func run(args []string) error {
 	if err := validateWordPair(wp.FirstWord, wp.SecondWord); err != nil {
 		return err
 	}
-	isAnagram := areAnagrams(wp.FirstWord, wp.SecondWord)
+	isAnagram := areAnagrams(wp.FirstWord, wp.SecondWord, anagram.FreqMapChecker{})
 	fmt.Printf("Word 1: %s\n", wp.FirstWord)
 	fmt.Printf("Word 2: %s\n", wp.SecondWord)
 	fmt.Printf("Are Anagrams: %v\n", isAnagram)

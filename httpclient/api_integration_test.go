@@ -7,7 +7,13 @@ import (
 	"time"
 )
 
-const testHTTPTimeout = 2 * time.Second
+type MockDoer struct {
+	DoFunc func(*http.Request) (*http.Response, error)
+}
+
+func (m *MockDoer) Do(req *http.Request) (*http.Response, error) {
+	return m.DoFunc(req)
+}
 
 func TestFetchWordPair_Success(t *testing.T) {
 	t.Parallel()
