@@ -1,7 +1,6 @@
 package main
 
 import (
-	"apl-interview/anagram"
 	"strings"
 	"testing"
 )
@@ -120,28 +119,5 @@ func TestBuildAPIClient(t *testing.T) {
 				t.Fatalf("buildAPIClient(%q) unexpected error: %v", testCase.inputURL, err)
 			}
 		})
-	}
-}
-
-func TestAreAnagrams(t *testing.T) {
-	tests := []struct {
-		name    string
-		args    []string
-		wantErr bool
-	}{
-		{"valid word pair", []string{"listen", "silent"}, false},
-		{"non-alphabetic word pair", []string{"domain", "amodin"}, false},
-		{"different length word pair", []string{"listentome", "silent"}, true},
-	}
-
-	for _, testCase := range tests {
-		testCase := testCase
-		t.Run(testCase.name, func(t *testing.T) {
-			result := areAnagrams(testCase.args[0], testCase.args[1], anagram.FreqMapChecker{})
-			if result == testCase.wantErr {
-				t.Fatalf("areAnagrams(%v) = %v, want %v", testCase.args, result, testCase.wantErr)
-			}
-		})
-
 	}
 }

@@ -17,6 +17,8 @@ var areAnagramCases = []struct {
 	{name: "same letters different counts", w1: "aab", w2: "aba", want: true},
 	{name: "case sensitive false", w1: "Listen", w2: "Silent", want: false},
 	{name: "different letters", w1: "foo", w2: "bar", want: false},
+	{name: "another anagram word pair", w1: "domain", w2: "amodin", want: true},
+	{name: "different length word pair", w1: "listentome", w2: "silent", want: false},
 }
 
 func runCheckerTests(t *testing.T, c Checker) {
