@@ -4,7 +4,6 @@ import (
 	"apl-interview/anagram"
 	"apl-interview/httpclient"
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"net/url"
@@ -44,16 +43,6 @@ func fetchWordPair(ctx context.Context, ac *httpclient.APIClient) (*httpclient.W
 		return nil, fmt.Errorf("failed to get word pair: %w", err)
 	}
 	return wp, nil
-}
-
-func validateWordPair(word1, word2 string) error {
-	if !anagram.IsAlphabetic(word1) || !anagram.IsAlphabetic(word2) {
-		return errors.New("words must contain only letters")
-	}
-	if len([]rune(word1)) != len([]rune(word2)) {
-		return fmt.Errorf("words do not match in length, word1: %q & word2: %q", word1, word2)
-	}
-	return nil
 }
 
 func areAnagrams(word1, word2 string, strategy anagram.Checker) bool {

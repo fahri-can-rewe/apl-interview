@@ -35,7 +35,7 @@ func run(ctx context.Context, args []string) error {
 		return err
 	}
 
-	if err := validateWordPair(wp.FirstWord, wp.SecondWord); err != nil {
+	if err := anagram.ValidateWordPair(wp.FirstWord, wp.SecondWord); err != nil {
 		return err
 	}
 	isAnagram := areAnagrams(wp.FirstWord, wp.SecondWord, anagram.FreqMapChecker{})

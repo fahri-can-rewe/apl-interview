@@ -2,7 +2,7 @@ package anagram
 
 import "unicode"
 
-func IsAlphabetic(word string) bool {
+func isAlphabetic(word string) bool {
 	for _, val := range word {
 		if !unicode.IsLetter(val) {
 			return false
