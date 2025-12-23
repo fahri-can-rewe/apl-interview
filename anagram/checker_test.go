@@ -14,7 +14,6 @@ var areAnagramCases = []struct {
 	{name: "cjk true", w1: "夜空", w2: "空夜", want: true},
 	{name: "emoji true", w1: "😀😃", w2: "😃😀", want: true},
 	{name: "empty strings", w1: "", w2: "", want: true},
-	{name: "length mismatch", w1: "abc", w2: "ab", want: false},
 	{name: "same letters different counts", w1: "aab", w2: "aba", want: true},
 	{name: "case sensitive false", w1: "Listen", w2: "Silent", want: false},
 	{name: "different letters", w1: "foo", w2: "bar", want: false},

@@ -10,7 +10,8 @@ func TestValidateWordPair(t *testing.T) {
 	}{
 		{"valid word pair", []string{"listen", "silent"}, false},
 		{"non-alphabetic word pair", []string{"listen1", "silent1"}, true},
-		{"different length word pair", []string{"listentome", "silent"}, true},
+		{"same length and characters", []string{"silont", "silent"}, false},
+		{"different length and characters", []string{"abc", "ab"}, true},
 	}
 
 	for _, testCase := range tests {

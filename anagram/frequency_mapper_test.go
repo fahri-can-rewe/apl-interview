@@ -112,8 +112,8 @@ func TestAreAnagrams(t *testing.T) {
 	for _, testCase := range tests {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
-			if got := AreAnagrams(testCase.first, testCase.second); got != testCase.want {
-				t.Errorf("AreAnagrams(%v, %v) = expected: %v, actual: %v", testCase.first, testCase.second, testCase.want, got)
+			if got := EqualFreqMaps(testCase.first, testCase.second); got != testCase.want {
+				t.Errorf("EqualFreqMaps(%v, %v) = expected: %v, actual: %v", testCase.first, testCase.second, testCase.want, got)
 			}
 		})
 	}
