@@ -1,6 +1,10 @@
 package anagram
 
-import "sort"
+import (
+	"errors"
+	"fmt"
+	"unicode"
+)
 
 // Checker reports whether two words are anagrams under the project’s domain rules.
 // Preconditions (must be satisfied by the caller):
@@ -10,21 +14,22 @@ type Checker interface {
 	AreAnagrams(w1, w2 string) bool
 }
 
-type FreqMapChecker struct{}
-
-func (FreqMapChecker) AreAnagrams(w1, w2 string) bool {
-	return EqualFreqMaps(CountLetters(w1), CountLetters(w2))
+func validateWordPair(word1, word2 string) error {
+	if word1 == "" || word2 == "" {
+		return errors.New("words must be non-empty")
+	}
+	if !isAlphabetic(word1) || !isAlphabetic(word2) {
+		return errors.New("words must contain only letters")
+	}
+	if len([]rune(word1)) != len([]rune(word2)) {
+		return fmt.Errorf("words do not match in length, word1: %q & word2: %q", word1, word2)
+	}
+	return nil
 }
 
-type SortChecker struct{}
-
-func (SortChecker) AreAnagrams(w1, w2 string) bool {
-	r1 := []rune(w1)
-	r2 := []rune(w2)
-	sort.Slice(r1, func(i, j int) bool { return r1[i] < r1[j] })
-	sort.Slice(r2, func(i, j int) bool { return r2[i] < r2[j] })
-	for i := range r1 {
-		if r1[i] != r2[i] {
+func isAlphabetic(word string) bool {
+	for _, val := range word {
+		if !unicode.IsLetter(val) {
 			return false
 		}
 	}

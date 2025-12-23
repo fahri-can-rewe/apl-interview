@@ -26,10 +26,7 @@ A small Go CLI that fetches a pair of words from a remote API and prints whether
 ```
 .
 ├─ cmd/wordpair/                 # CLI entrypoint (composition root)
-│  ├─ main.go
-│  ├─ helpers.go                 # flags, endpoint construction, API client wiring
-│  ├─ helpers_test.go
-│  └─ helpers_integration_test.go
+│  └─ main.go
 ├─ anagram/                      # domain: validation and anagram strategies
 │  ├─ checker.go
 │  ├─ checker_test.go
@@ -40,6 +37,12 @@ A small Go CLI that fetches a pair of words from a remote API and prints whether
 ├─ httpclient/                   # minimal HTTP API client
 │  ├─ api.go
 │  └─ api_integration_test.go
+├─ internal/                     # internal app glue (not exported)
+│  ├─ config.go                  # configuration & endpoint assembly (ParseArgs, MakeEndpoint)
+│  ├─ config_test.go
+│  ├─ helpers.go                 # HTTP helpers used in tests (e.g., fetchWordPair)
+│  ├─ helpers_test.go
+│  └─ helpers_integration_test.go
 ├─ Dockerfile                    # multi-stage build (Alpine)
 ├─ go.mod
 ├─ LICENSE

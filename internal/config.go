@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"apl-interview/httpclient"
-	"context"
 	"flag"
 	"fmt"
 	"net/url"
@@ -13,6 +11,7 @@ const (
 	apiPath           = "/word-pair"
 )
 
+// Config holds CLI configuration derived from flags.
 type Config struct {
 	APIBaseURL string
 }
@@ -26,26 +25,10 @@ func ParseArgs(args []string) (Config, error) {
 	return Config{APIBaseURL: *apiBaseURL}, nil
 }
 
-func BuildAPIClient(apiBaseURL string) (*httpclient.APIClient, error) {
-	endpoint, err := makeEndpoint(apiBaseURL)
-	if err != nil {
-		return nil, err
-	}
-	return httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint)), nil
-}
-
-func makeEndpoint(apiBaseURL string) (string, error) {
+func MakeEndpoint(apiBaseURL string) (string, error) {
 	address, err := url.Parse(apiBaseURL)
 	if err != nil || address.Scheme == "" || address.Host == "" {
 		return "", fmt.Errorf("bad --apiBaseUrl: %q", apiBaseURL)
 	}
 	return url.JoinPath(address.String(), apiPath)
-}
-
-func fetchWordPair(ctx context.Context, ac *httpclient.APIClient) (*httpclient.WordPair, error) {
-	wp, err := ac.FetchWordPair(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get word pair: %w", err)
-	}
-	return wp, nil
 }

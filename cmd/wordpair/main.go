@@ -26,10 +26,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client, err := internal.BuildAPIClient(conf.APIBaseURL)
+	endpoint, err := internal.MakeEndpoint(conf.APIBaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
+	client := httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint))
 
 	var checker anagram.Checker = anagram.FreqMapChecker{}
 
@@ -42,10 +43,6 @@ func run(ctx context.Context, fetcher WordPairFetcher, checker anagram.Checker) 
 	wp, err := fetcher.FetchWordPair(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get word pair: %w", err)
-	}
-
-	if err := anagram.ValidateWordPair(wp.FirstWord, wp.SecondWord); err != nil {
-		return err
 	}
 
 	isAnagram := checker.AreAnagrams(wp.FirstWord, wp.SecondWord)
