@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"time"
 )
@@ -17,23 +16,24 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
 
-	endpoint := constructEndpoint()
-	client := httpclient.NewAPIClient(
-		httpclient.WithEndpoint(endpoint),
-	)
+	conf, err := parseArgs(os.Args[1:])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client, err := buildAPIClient(conf.APIBaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var checker anagram.Checker = anagram.FreqMapChecker{}
 
-	if err := run(ctx, os.Args[1:], client, checker); err != nil {
+	if err := run(ctx, client, checker); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(ctx context.Context, args []string, fetcher WordPairFetcher, checker anagram.Checker) error {
-	if _, err := parseArgs(args); err != nil {
-		return err
-	}
-
+func run(ctx context.Context, fetcher WordPairFetcher, checker anagram.Checker) error {
 	wp, err := fetcher.FetchWordPair(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get word pair: %w", err)
@@ -53,10 +53,4 @@ func run(ctx context.Context, args []string, fetcher WordPairFetcher, checker an
 
 type WordPairFetcher interface {
 	FetchWordPair(ctx context.Context) (*httpclient.WordPair, error)
-}
-
-func constructEndpoint() string {
-	base, _ := url.Parse(defaultAPIBaseURL)
-	endpoint, _ := url.JoinPath(base.String(), apiPath)
-	return endpoint
 }

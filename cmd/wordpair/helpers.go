@@ -26,14 +26,20 @@ func parseArgs(args []string) (config, error) {
 	return config{APIBaseURL: *apiBaseURL}, nil
 }
 
-func buildAPIClient(apiBaseURL string) (*httpclient.APIClient, error) {
+func makeEndpoint(apiBaseURL string) (string, error) {
 	address, err := url.Parse(apiBaseURL)
 	if err != nil || address.Scheme == "" || address.Host == "" {
-		return nil, fmt.Errorf("bad --apiBaseUrl: %q", apiBaseURL)
+		return "", fmt.Errorf("bad --apiBaseUrl: %q", apiBaseURL)
 	}
-	endpoint, _ := url.JoinPath(address.String(), apiPath)
-	client := httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint))
-	return client, nil
+	return url.JoinPath(address.String(), apiPath)
+}
+
+func buildAPIClient(apiBaseURL string) (*httpclient.APIClient, error) {
+	endpoint, err := makeEndpoint(apiBaseURL)
+	if err != nil {
+		return nil, err
+	}
+	return httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint)), nil
 }
 
 func fetchWordPair(ctx context.Context, ac *httpclient.APIClient) (*httpclient.WordPair, error) {
