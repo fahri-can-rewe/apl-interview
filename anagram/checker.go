@@ -8,8 +8,8 @@ import (
 
 // Checker reports whether two words are anagrams under the project’s domain rules.
 // Preconditions (must be satisfied by the caller):
-//   - Inputs are validated via anagram.ValidateWordPair (letters-only per unicode.IsLetter; equal length).
-//   - Inputs are already case-normalized (lower-cased using Unicode case folding) in a consistent Unicode normalization form
+//   - Inputs are validated via letters-only per unicode.IsLetter
+//   - Inputs must be equal length and non-empty
 type Checker interface {
 	AreAnagrams(w1, w2 string) bool
 }
