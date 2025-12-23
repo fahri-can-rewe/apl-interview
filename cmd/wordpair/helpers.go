@@ -1,7 +1,6 @@
 package main
 
 import (
-	"apl-interview/anagram"
 	"apl-interview/httpclient"
 	"context"
 	"flag"
@@ -43,8 +42,4 @@ func fetchWordPair(ctx context.Context, ac *httpclient.APIClient) (*httpclient.W
 		return nil, fmt.Errorf("failed to get word pair: %w", err)
 	}
 	return wp, nil
-}
-
-func areAnagrams(word1, word2 string, strategy anagram.Checker) bool {
-	return strategy.AreAnagrams(word1, word2)
 }
