@@ -25,15 +25,25 @@ A small Go CLI that fetches a pair of words from a remote API and prints whether
 
 ```
 .
-├─ cmd/wordpair/        # CLI entrypoint
+├─ cmd/wordpair/                 # CLI entrypoint (composition root)
 │  ├─ main.go
-│  └─ helpers.go        # flags, API client wiring, validation
-├─ anagram/             # anagram algorithm implementation
-│  └─ algorithm.go
-├─ httpclient/          # minimal API client
-│  └─ api.go
-├─ Dockerfile           # multi-stage build (Alpine)
+│  ├─ helpers.go                 # flags, endpoint construction, API client wiring
+│  ├─ helpers_test.go
+│  └─ helpers_integration_test.go
+├─ anagram/                      # domain: validation and anagram strategies
+│  ├─ checker.go
+│  ├─ checker_test.go
+│  ├─ frequency_mapper.go
+│  ├─ frequency_mapper_test.go
+│  ├─ validation.go
+│  └─ validation_test.go
+├─ httpclient/                   # minimal HTTP API client
+│  ├─ api.go
+│  └─ api_integration_test.go
+├─ Dockerfile                    # multi-stage build (Alpine)
 ├─ go.mod
+├─ LICENSE
+├─ requirements.md
 └─ README.md
 ```
 
