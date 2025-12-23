@@ -1,14 +1,15 @@
 package main
 
 import (
-	"apl-interview/anagram"
-	"apl-interview/httpclient"
-	"apl-interview/internal"
 	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/fahri-can-rewe/apl-interview/anagram"
+	"github.com/fahri-can-rewe/apl-interview/httpclient"
+	"github.com/fahri-can-rewe/apl-interview/internal"
 )
 
 const fiveSecondsTimeout = 5 * time.Second
@@ -32,7 +33,7 @@ func main() {
 	}
 	client := httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint))
 
-	var checker anagram.Checker = anagram.FreqMapChecker{}
+	var checker anagram.Checker = anagram.SortChecker{}
 
 	if err := run(ctx, client, checker); err != nil {
 		log.Fatal(err)
