@@ -19,10 +19,7 @@ func CountLetters(word string) map[rune]int {
 	return letterFreqCount
 }
 
-func AreAnagrams(freqCountFirstWord, freqCountSecondWord map[rune]int) bool {
-	if len(freqCountFirstWord) != len(freqCountSecondWord) {
-		return false
-	}
+func EqualFreqMaps(freqCountFirstWord, freqCountSecondWord map[rune]int) bool {
 	for char, count := range freqCountFirstWord {
 		if freqCountSecondWord[char] != count {
 			return false
