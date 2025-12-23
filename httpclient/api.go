@@ -28,32 +28,32 @@ type Option func(*APIClient)
 func WithEndpoint(ep string) Option         { return func(c *APIClient) { c.endpoint = ep } }
 func WithHTTPClient(hc *http.Client) Option { return func(c *APIClient) { c.doer = hc } }
 func WithTimeout(d time.Duration) Option {
-	return func(ac *APIClient) {
-		if hc, isOk := ac.doer.(*http.Client); isOk {
+	return func(client *APIClient) {
+		if hc, isOk := client.doer.(*http.Client); isOk {
 			hc.Timeout = d
 		}
 	}
 }
 
-func NewAPIClient(opts ...Option) *APIClient {
-	c := &APIClient{
+func NewAPIClient(options ...Option) *APIClient {
+	client := &APIClient{
 		doer: &http.Client{Timeout: 5 * time.Second},
 	}
-	for _, opt := range opts {
-		opt(c)
+	for _, opt := range options {
+		opt(client)
 	}
-	return c
+	return client
 }
 
-func (ac *APIClient) FetchWordPair(ctx context.Context) (*WordPair, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, ac.endpoint, nil)
+func (client *APIClient) FetchWordPair(ctx context.Context) (*WordPair, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, client.endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("build request: %w", err)
 	}
 
-	resp, err := ac.doer.Do(req)
+	resp, err := client.doer.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("GET %s: %w", ac.endpoint, err)
+		return nil, fmt.Errorf("GET %s: %w", client.endpoint, err)
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
