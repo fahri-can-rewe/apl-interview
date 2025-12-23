@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -12,8 +13,6 @@ const testHTTPTimeout = 100 * time.Millisecond
 
 func TestFetchWordPair_Success(t *testing.T) {
 	t.Parallel()
-
-	// Assign
 	server := httptest.NewServer(http.HandlerFunc(func(respWriter http.ResponseWriter, _ *http.Request) {
 		respWriter.Header().Set("Content-Type", "application/json")
 		respWriter.WriteHeader(http.StatusOK)
@@ -28,10 +27,8 @@ func TestFetchWordPair_Success(t *testing.T) {
 		WithEndpoint(server.URL),
 	)
 
-	// Act
 	wordPair, err := client.FetchWordPair(context.Background())
 
-	// Assert
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -44,10 +41,22 @@ func TestFetchWordPair_Success(t *testing.T) {
 	}
 }
 
+func TestFetchWordPair_BuildRequestError(t *testing.T) {
+	incorrectURL := "http://[::1]:namedport"
+	client := NewAPIClient(WithEndpoint(incorrectURL))
+
+	_, err := client.FetchWordPair(context.Background())
+
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "build request:") {
+		t.Fatalf("error = %q, want it to contain %q", err, "build request:")
+	}
+}
+
 func TestFetchWordPair_ServerError(t *testing.T) {
 	t.Parallel()
-
-	// Assign
 	server := httptest.NewServer(http.HandlerFunc(func(respWriter http.ResponseWriter, req *http.Request) {
 		respWriter.WriteHeader(http.StatusInternalServerError)
 	}))
@@ -55,10 +64,8 @@ func TestFetchWordPair_ServerError(t *testing.T) {
 	httpClient := &http.Client{Timeout: testHTTPTimeout}
 	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint(server.URL))
 
-	// Act
 	wordPair, err := client.FetchWordPair(context.Background())
 
-	// Assert
 	if err == nil {
 		t.Fatal("want error, got nil")
 	}
@@ -69,8 +76,6 @@ func TestFetchWordPair_ServerError(t *testing.T) {
 
 func TestFetchWordPair_InvalidJSON(t *testing.T) {
 	t.Parallel()
-
-	// Assign
 	server := httptest.NewServer(http.HandlerFunc(func(respWriter http.ResponseWriter, req *http.Request) {
 		respWriter.WriteHeader(http.StatusOK)
 		_, err := respWriter.Write([]byte(`{"word1": " brokenJSON",`))
@@ -82,10 +87,8 @@ func TestFetchWordPair_InvalidJSON(t *testing.T) {
 	httpClient := &http.Client{Timeout: testHTTPTimeout}
 	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint(server.URL))
 
-	// Act
 	wordPair, err := client.FetchWordPair(context.Background())
 
-	// Assert
 	if err == nil {
 		t.Fatal("want JSON decode error, got nil")
 	}
@@ -96,15 +99,11 @@ func TestFetchWordPair_InvalidJSON(t *testing.T) {
 
 func TestFetchWordPair_HTTPError(t *testing.T) {
 	t.Parallel()
-
-	// Assign
 	httpClient := &http.Client{Timeout: testHTTPTimeout}
 	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint("http://127.0.0.1:0"))
 
-	// Act
 	wordPair, err := client.FetchWordPair(context.Background())
 
-	// Assert
 	if err == nil {
 		t.Fatal("want HTTP error, got nil")
 	}
@@ -115,8 +114,6 @@ func TestFetchWordPair_HTTPError(t *testing.T) {
 
 func TestFetchWordPair_Timeout(t *testing.T) {
 	t.Parallel()
-
-	// Assign
 	server := httptest.NewServer(http.HandlerFunc(func(respWriter http.ResponseWriter, req *http.Request) {
 		time.Sleep(200 * time.Millisecond)
 		respWriter.WriteHeader(http.StatusOK)
@@ -127,12 +124,10 @@ func TestFetchWordPair_Timeout(t *testing.T) {
 	}))
 	defer server.Close()
 	httpClient := &http.Client{Timeout: 50 * time.Millisecond}
-	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint(server.URL))
+	client := NewAPIClient(WithHTTPClient(httpClient), WithEndpoint(server.URL), WithTimeout(100*time.Millisecond))
 
-	// Act
 	wordPair, err := client.FetchWordPair(context.Background())
 
-	// Assert
 	if err == nil {
 		t.Fatal("want timeout error, got nil")
 	}
