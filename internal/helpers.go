@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"apl-interview/httpclient"
@@ -13,17 +13,25 @@ const (
 	apiPath           = "/word-pair"
 )
 
-type config struct {
+type Config struct {
 	APIBaseURL string
 }
 
-func parseArgs(args []string) (config, error) {
+func ParseArgs(args []string) (Config, error) {
 	fs := flag.NewFlagSet("wordpair", flag.ContinueOnError)
 	apiBaseURL := fs.String("apiBaseUrl", defaultAPIBaseURL, "Base URL of the Word-Pair API")
 	if err := fs.Parse(args); err != nil {
-		return config{}, err
+		return Config{}, err
 	}
-	return config{APIBaseURL: *apiBaseURL}, nil
+	return Config{APIBaseURL: *apiBaseURL}, nil
+}
+
+func BuildAPIClient(apiBaseURL string) (*httpclient.APIClient, error) {
+	endpoint, err := makeEndpoint(apiBaseURL)
+	if err != nil {
+		return nil, err
+	}
+	return httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint)), nil
 }
 
 func makeEndpoint(apiBaseURL string) (string, error) {
@@ -32,14 +40,6 @@ func makeEndpoint(apiBaseURL string) (string, error) {
 		return "", fmt.Errorf("bad --apiBaseUrl: %q", apiBaseURL)
 	}
 	return url.JoinPath(address.String(), apiPath)
-}
-
-func buildAPIClient(apiBaseURL string) (*httpclient.APIClient, error) {
-	endpoint, err := makeEndpoint(apiBaseURL)
-	if err != nil {
-		return nil, err
-	}
-	return httpclient.NewAPIClient(httpclient.WithEndpoint(endpoint)), nil
 }
 
 func fetchWordPair(ctx context.Context, ac *httpclient.APIClient) (*httpclient.WordPair, error) {

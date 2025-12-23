@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"strings"
@@ -20,7 +20,7 @@ func TestParseArgs(t *testing.T) {
 	for _, testCase := range tests {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
-			conf, err := parseArgs(testCase.args)
+			conf, err := ParseArgs(testCase.args)
 			if (err != nil) != testCase.wantErr {
 				t.Fatalf("parseArgs(%v) error = %v, wantErr %v", testCase.args, err, testCase.wantErr)
 			}
@@ -104,7 +104,7 @@ func TestBuildAPIClient(t *testing.T) {
 	for _, testCase := range tests {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
-			_, err := buildAPIClient(testCase.inputURL)
+			_, err := BuildAPIClient(testCase.inputURL)
 			if testCase.expectError {
 				if err == nil {
 					t.Errorf("buildAPIClient(%q) expected error, got nil", testCase.inputURL)

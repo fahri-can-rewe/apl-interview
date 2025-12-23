@@ -3,6 +3,7 @@ package main
 import (
 	"apl-interview/anagram"
 	"apl-interview/httpclient"
+	"apl-interview/internal"
 	"context"
 	"fmt"
 	"log"
@@ -12,16 +13,20 @@ import (
 
 const fiveSecondsTimeout = 5 * time.Second
 
+type WordPairFetcher interface {
+	FetchWordPair(ctx context.Context) (*httpclient.WordPair, error)
+}
+
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
 
-	conf, err := parseArgs(os.Args[1:])
+	conf, err := internal.ParseArgs(os.Args[1:])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client, err := buildAPIClient(conf.APIBaseURL)
+	client, err := internal.BuildAPIClient(conf.APIBaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,8 +54,4 @@ func run(ctx context.Context, fetcher WordPairFetcher, checker anagram.Checker) 
 	fmt.Printf("Word 2: %s\n", wp.SecondWord)
 	fmt.Printf("Are Anagrams: %v\n", isAnagram)
 	return nil
-}
-
-type WordPairFetcher interface {
-	FetchWordPair(ctx context.Context) (*httpclient.WordPair, error)
 }
