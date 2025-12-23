@@ -34,7 +34,7 @@ func TestIsAlphabetic(t *testing.T) {
 	for _, testCase := range tests {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
-			if got := IsAlphabetic(testCase.in); got != testCase.want {
+			if got := isAlphabetic(testCase.in); got != testCase.want {
 				t.Errorf("IsAlphabetic(%q) = expected: %v, actual: %v", testCase.in, testCase.want, got)
 			}
 		})
