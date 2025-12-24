@@ -25,25 +25,25 @@ A small Go CLI that fetches a pair of words from a remote API and prints whether
 
 ```
 .
-├─ cmd/wordpair/                 # CLI entrypoint (composition root)
-│  └─ main.go
-├─ anagram/                      # domain: validation and anagram strategies
-│  ├─ checker.go
-│  ├─ checker_test.go
-│  ├─ frequency_mapper.go
-│  ├─ frequency_mapper_test.go
-│  ├─ validation.go
-│  └─ validation_test.go
-├─ httpclient/                   # minimal HTTP API client
-│  ├─ api.go
-│  └─ api_integration_test.go
-├─ internal/                     # internal app glue (not exported)
-│  ├─ config.go                  # configuration & endpoint assembly (ParseArgs, MakeEndpoint)
-│  ├─ config_test.go
-│  ├─ helpers.go                 # HTTP helpers used in tests (e.g., fetchWordPair)
-│  ├─ helpers_test.go
-│  └─ helpers_integration_test.go
+├─ cmd/
+│  └─ wordpair/                  # CLI entrypoint (composition root)
+│     └─ main.go
+├─ internal/
+│  ├─ anagram/                   # anagram checking strategies
+│  │  ├─ checker.go
+│  │  ├─ checker_test.go
+│  │  ├─ freq_map_checker.go
+│  │  ├─ freq_map_checker_test.go
+│  │  ├─ sort_checker.go
+│  │  └─ sort_checker_test.go
+│  ├─ config/                    # flags parsing & endpoint assembly
+│  │  ├─ config.go
+│  │  └─ config_test.go
+│  └─ httpclient/                # minimal HTTP API client
+│     ├─ api.go
+│     └─ api_integration_test.go
 ├─ Dockerfile                    # multi-stage build (Alpine)
+├─ Justfile                      # common dev tasks (build, test, run, docker)
 ├─ go.mod
 ├─ LICENSE
 ├─ requirements.md
