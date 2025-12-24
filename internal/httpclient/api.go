@@ -14,6 +14,10 @@ type WordPair struct {
 	SecondWord string `json:"word2"`
 }
 
+type WordPairFetcher interface {
+	FetchWordPair(ctx context.Context) (*WordPair, error)
+}
+
 type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }

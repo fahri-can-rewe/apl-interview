@@ -14,10 +14,6 @@ import (
 
 const fiveSecondsTimeout = 5 * time.Second
 
-type WordPairFetcher interface {
-	FetchWordPair(ctx context.Context) (*httpclient.WordPair, error)
-}
-
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
@@ -40,7 +36,7 @@ func main() {
 	}
 }
 
-func run(ctx context.Context, fetcher WordPairFetcher, checker anagram.Checker) error {
+func run(ctx context.Context, fetcher httpclient.WordPairFetcher, checker anagram.Checker) error {
 	wp, err := fetcher.FetchWordPair(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get word pair: %w", err)
