@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/fahri-can-rewe/apl-interview/anagram"
-	"github.com/fahri-can-rewe/apl-interview/httpclient"
-	"github.com/fahri-can-rewe/apl-interview/internal"
+	"github.com/fahri-can-rewe/apl-interview/internal/anagram"
+	"github.com/fahri-can-rewe/apl-interview/internal/config"
+	"github.com/fahri-can-rewe/apl-interview/internal/httpclient"
 )
 
 const fiveSecondsTimeout = 5 * time.Second
@@ -22,12 +22,12 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
 
-	conf, err := internal.ParseArgs(os.Args[1:])
+	conf, err := config.ParseArgs(os.Args[1:])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	endpoint, err := internal.MakeEndpoint(conf.APIBaseURL)
+	endpoint, err := config.MakeEndpoint(conf.APIBaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
